@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    const DEFAULT_CONFIG = { active: true };
+    const DEFAULT_CONFIG = { active: true, mode: 'popular', upmasterName: '' };
 
     function postConfig(config) {
         window.postMessage({ type: 'cocoon-config', config: config }, '*');
