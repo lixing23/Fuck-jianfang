@@ -258,6 +258,41 @@
         return added;
     }
 
+    // ---- 模式6: 新号模式（无cookie调推荐API）----
+    async function fillFresh() {
+        let added = 0;
+        try {
+            // 不带cookie和个性化header，模拟新号/未登录状态
+            // 连续拉3页，每页20条
+            const results = await Promise.all([1, 2, 3].map(idx =>
+                fetch(`https://api.bilibili.com/x/web-interface/index/top/feed/rcmd?ps=20&fresh_idx=${idx}&fresh_type=4`, {
+                    credentials: 'omit', // 关键：不带cookie
+                    headers: { 'Accept': 'application/json' }
+                }).then(r => r.json()).catch(() => null)
+            ));
+            results.forEach(d => {
+                if (!d || d.code !== 0 || !d.data?.item) return;
+                d.data.item.forEach(item => {
+                    if (item.goto !== 'av' || !item.bvid) return;
+                    if (pushVideo({
+                        bvid: item.bvid,
+                        aid: item.id,
+                        cid: item.cid,
+                        title: item.title,
+                        pic: (item.pic || '').replace('http://', 'https://'),
+                        owner: { name: item.owner?.name || '', mid: item.owner?.mid || 0, face: item.owner?.face || '' },
+                        stat: { view: item.stat?.view || 0, like: item.stat?.like || 0, danmaku: item.stat?.danmaku || 0 },
+                        duration: item.duration,
+                        pubdate: item.pubdate
+                    })) added++;
+                });
+            });
+        } catch (e) {
+            console.log('[Fuck茧房] 新号模式填充失败:', e);
+        }
+        return added;
+    }
+
     // ---- 模式5: 每周必看 ----
     async function fillWeekly() {
         let added = 0;
@@ -286,12 +321,13 @@
         loadingMore = true;
         try {
             let added = 0;
-            const modeLabel = { popular: '热门池', upmaster: 'UP主画像', crossregion: '跨分区', niche: '冷门优质', weekly: '每周必看' }[mode] || mode;
+            const modeLabel = { popular: '热门池', upmaster: 'UP主画像', crossregion: '跨分区', niche: '冷门优质', weekly: '每周必看', fresh: '新号模式' }[mode] || mode;
             switch (mode) {
                 case 'upmaster': added = await fillUpmaster(); break;
                 case 'crossregion': added = await fillCrossRegion(); break;
                 case 'niche': added = await fillNiche(); break;
                 case 'weekly': added = await fillWeekly(); break;
+                case 'fresh': added = await fillFresh(); break;
                 default: added = await fillPopular(); break;
             }
             console.log(`[Fuck茧房] [${modeLabel}] 视频池已填充:`, videoPool.length, '个 (+', added, ')');

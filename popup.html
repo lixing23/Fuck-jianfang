@@ -159,11 +159,12 @@ input:checked + .slider::before { transform: translateX(16px); }
 <div class="mode-section">
     <div class="label">内容模式</div>
     <div class="mode-grid">
-        <button class="mode-btn active" data-mode="popular">热门池</button>
+        <button class="mode-btn" data-mode="popular">热门池</button>
         <button class="mode-btn" data-mode="upmaster">UP主画像</button>
         <button class="mode-btn" data-mode="crossregion">跨分区</button>
         <button class="mode-btn" data-mode="niche">冷门优质</button>
-        <button class="mode-btn" data-mode="weekly" style="grid-column: span 2;">每周必看</button>
+        <button class="mode-btn" data-mode="weekly">每周必看</button>
+        <button class="mode-btn" data-mode="fresh">新号模式</button>
     </div>
     <div class="upmaster-input" id="upmaster-input">
         <input type="text" id="upmaster-name" placeholder="输入UP主名字，如 老番茄">
