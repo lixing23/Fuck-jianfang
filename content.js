@@ -18,7 +18,10 @@
             upmasterName = newName;
             console.log('[Fuck茧房] 配置已更新:', active ? '启用' : '关闭', '模式:', mode, upmasterName ? 'UP:' + upmasterName : '');
             if (active) {
-                if (modeChanged) resetPool();
+                if (modeChanged) {
+                    resetPool();
+                    loadingMore = false; // 强制解锁，让新模式能立即填充
+                }
                 fillPool();
             }
         }
@@ -445,7 +448,11 @@
     function init() {
         if (window.location.hostname !== 'www.bilibili.com' && window.location.hostname !== 'bilibili.com') return;
         installResponseInterceptor();
-        fillPool();
+        // 不主动填充，等配置消息到达后由配置驱动 fillPool()
+        // 若 1.5 秒后仍未收到配置，兜底用默认模式填充
+        setTimeout(function () {
+            if (videoPool.length === 0 && !loadingMore) fillPool();
+        }, 1500);
     }
 
     init();
