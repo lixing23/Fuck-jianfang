@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "Fuck茧房",
+    "version": "3.0.0",
+    "description": "在数据源头替换B站首页推荐流为跨分区内容，打破信息茧房，零卡顿。",
+    "permissions": ["storage"],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://www.bilibili.com/*", "*://bilibili.com/*"],
+            "js": ["storage-bridge.js"],
+            "run_at": "document_start",
+            "all_frames": false
+        },
+        {
+            "matches": ["*://www.bilibili.com/*", "*://bilibili.com/*"],
+            "js": ["content.js"],
+            "run_at": "document_start",
+            "world": "MAIN",
+            "all_frames": false
+        }
+    ]
+}
